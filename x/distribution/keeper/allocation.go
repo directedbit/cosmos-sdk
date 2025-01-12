@@ -90,10 +90,12 @@ func (k Keeper) AllocateTokens(
 
 		// TODO consider microslashing for missing votes.
 		// ref https://github.com/cosmos/cosmos-sdk/issues/2525#issuecomment-430838701
-		powerFraction := sdk.NewDec(vote.Validator.Power).QuoTruncate(sdk.NewDec(totalPreviousPower))
-		reward := feesCollected.MulDecTruncate(voteMultiplier).MulDecTruncate(powerFraction)
-		k.AllocateTokensToValidator(ctx, validator, reward)
-		remaining = remaining.Sub(reward)
+		if validator != nil {
+			powerFraction := sdk.NewDec(vote.Validator.Power).QuoTruncate(sdk.NewDec(totalPreviousPower))
+			reward := feesCollected.MulDecTruncate(voteMultiplier).MulDecTruncate(powerFraction)
+			k.AllocateTokensToValidator(ctx, validator, reward)
+			remaining = remaining.Sub(reward)
+		}
 	}
 
 	// allocate community funding
